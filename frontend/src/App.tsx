@@ -4,9 +4,16 @@ import { AppShell } from "@/components/layout/AppShell";
 import type { NavKey } from "@/components/layout/BottomNav";
 import { OnboardingScreen } from "@/pages/OnboardingScreen";
 import { MatrixScreen } from "@/pages/MatrixScreen";
+import { CompatOnboarding } from "@/pages/CompatOnboarding";
+import { CompatibilityScreen } from "@/pages/CompatibilityScreen";
 import { PlaceholderScreen } from "@/pages/PlaceholderScreen";
 import { useTelegram } from "@/hooks/useTelegram";
-import { api, type BirthData, type MatrixResult } from "@/services/api";
+import {
+  api,
+  type BirthData,
+  type CompatibilityResult,
+  type MatrixResult,
+} from "@/services/api";
 
 type Stage = "onboarding" | "matrix";
 
@@ -17,6 +24,10 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [matrix, setMatrix] = useState<MatrixResult | null>(null);
+
+  const [compatLoading, setCompatLoading] = useState(false);
+  const [compatError, setCompatError] = useState<string | null>(null);
+  const [compat, setCompat] = useState<CompatibilityResult | null>(null);
 
   const handleSubmit = async (data: BirthData) => {
     setLoading(true);
@@ -33,6 +44,21 @@ export default function App() {
     }
   };
 
+  const handleCompatSubmit = async (a: BirthData, b: BirthData) => {
+    setCompatLoading(true);
+    setCompatError(null);
+    try {
+      const result = await api.calcCompatibility(a, b);
+      setCompat(result);
+    } catch (e) {
+      setCompatError(
+        e instanceof Error ? e.message : "Не удалось рассчитать совместимость",
+      );
+    } finally {
+      setCompatLoading(false);
+    }
+  };
+
   if (!ready) {
     return (
       <div className="grid place-items-center" style={{ minHeight: "var(--tg-vh)" }}>
@@ -40,6 +66,11 @@ export default function App() {
       </div>
     );
   }
+
+  // Prefill the partner form's "you" side from the existing personal matrix.
+  const partnerInitialA: BirthData | null = matrix
+    ? { name: matrix.name, date: matrix.birth, time: null }
+    : null;
 
   return (
     <AppShell
@@ -82,10 +113,25 @@ export default function App() {
                 }}
               />
             ) : tab === "compat" ? (
-              <PlaceholderScreen
-                title="Совместимость"
-                subtitle="Скрещивание двух матриц с визуализацией синергии. В работе."
-              />
+              compat ? (
+                <CompatibilityScreen
+                  result={compat}
+                  onRestart={() => setCompat(null)}
+                />
+              ) : (
+                <>
+                  <CompatOnboarding
+                    initialA={partnerInitialA}
+                    onSubmit={handleCompatSubmit}
+                    loading={compatLoading}
+                  />
+                  {compatError ? (
+                    <p className="mx-auto mt-3 max-w-md px-5 text-center text-xs text-red-300">
+                      {compatError}
+                    </p>
+                  ) : null}
+                </>
+              )
             ) : tab === "explore" ? (
               <PlaceholderScreen
                 title="Смыслы"

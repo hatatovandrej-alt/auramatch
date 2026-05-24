@@ -5,7 +5,9 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, status
 
-from app.core.matrix_calc import calculate_matrix
+# Alias the core function so it cannot be shadowed by a route handler defined
+# below — a recursion regression bit us once, this guard makes it impossible.
+from app.core.matrix_calc import calculate_matrix as core_calc_matrix
 from app.schemas.matrix import BirthData, MatrixResult
 
 router = APIRouter(prefix="/api", tags=["matrix"])
@@ -17,7 +19,7 @@ router = APIRouter(prefix="/api", tags=["matrix"])
     status_code=status.HTTP_200_OK,
     summary="Calculate personal Destiny Matrix",
 )
-def calculate_matrix(payload: BirthData) -> MatrixResult:
+def post_matrix(payload: BirthData) -> MatrixResult:
     if payload.date > date.today():
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -28,4 +30,4 @@ def calculate_matrix(payload: BirthData) -> MatrixResult:
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Поддерживаются даты начиная с 1900 года",
         )
-    return calculate_matrix(payload.name, payload.date)
+    return core_calc_matrix(payload.name, payload.date)

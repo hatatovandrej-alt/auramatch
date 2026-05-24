@@ -4,7 +4,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import health, matrix
+from app.api.routes import compatibility, health, matrix
 from app.core.config import settings
 
 
@@ -25,6 +25,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router)
     app.include_router(matrix.router)
+    app.include_router(compatibility.router)
     return app
 
 
