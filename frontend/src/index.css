@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --tg-vh: 100vh;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    background: #0a0612;
+    color: theme("colors.aura.champagne");
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior: none;
+  }
+
+  body {
+    font-family: theme("fontFamily.sans");
+    /* Stable height inside Telegram WebView (uses --tg-vh set from JS). */
+    min-height: var(--tg-vh);
+  }
+
+  /* Disable iOS tap highlight — premium feel requires custom press states. */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* Hide scrollbar but keep scroll */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer components {
+  .aura-card {
+    @apply relative overflow-hidden rounded-3xl border border-aura-amethyst/15 bg-aura-card shadow-aura backdrop-blur-xl;
+  }
+
+  .aura-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      transparent 40%
+    );
+    pointer-events: none;
+  }
+
+  .gold-text {
+    background: theme("backgroundImage.gold-shimmer");
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Numeric display — used for matrix values. Tabular figures keep alignment rock-solid. */
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+  }
+}
