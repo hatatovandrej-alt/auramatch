@@ -1,6 +1,6 @@
 /**
- * Thin REST client. Uses VITE_API_BASE in prod, falls back to /api in dev so a
- * Vite proxy or a co-located deployment can serve both.
+ * Thin REST client. Uses VITE_API_BASE in prod, falls back to /api in dev
+ * (Vite proxy in vite.config.ts forwards /api → http://127.0.0.1:8000).
  */
 const BASE = import.meta.env.VITE_API_BASE ?? "/api";
 
@@ -12,14 +12,27 @@ export interface BirthData {
   time?: string | null;
 }
 
+export type PointGroup =
+  | "corner"
+  | "diagonal"
+  | "center"
+  | "heart"
+  | "karma"
+  | "period";
+
 export interface MatrixPoint {
   key: string;
+  group: PointGroup;
   label: string;
   value: number;
+  arcana: string;
+  meaning: string;
+  age_range?: string | null;
 }
 
 export interface MatrixResult {
   name: string;
+  birth: string;
   points: MatrixPoint[];
   summary: string;
 }

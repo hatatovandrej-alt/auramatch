@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AppShell } from "@/components/layout/AppShell";
 import type { NavKey } from "@/components/layout/BottomNav";
 import { OnboardingScreen } from "@/pages/OnboardingScreen";
+import { MatrixScreen } from "@/pages/MatrixScreen";
 import { PlaceholderScreen } from "@/pages/PlaceholderScreen";
 import { useTelegram } from "@/hooks/useTelegram";
 import { api, type BirthData, type MatrixResult } from "@/services/api";
@@ -72,13 +73,13 @@ export default function App() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3 }}
           >
-            {tab === "matrix" ? (
-              <PlaceholderScreen
-                title={matrix ? `Матрица: ${matrix.name}` : "Матрица"}
-                subtitle={
-                  matrix?.summary ??
-                  "Интерактивная схема матрицы появится на следующем этапе."
-                }
+            {tab === "matrix" && matrix ? (
+              <MatrixScreen
+                result={matrix}
+                onRestart={() => {
+                  setStage("onboarding");
+                  setMatrix(null);
+                }}
               />
             ) : tab === "compat" ? (
               <PlaceholderScreen

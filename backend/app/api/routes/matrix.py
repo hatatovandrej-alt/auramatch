@@ -5,7 +5,7 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, status
 
-from app.core.matrix_calc import build_result
+from app.core.matrix_calc import calculate_matrix
 from app.schemas.matrix import BirthData, MatrixResult
 
 router = APIRouter(prefix="/api", tags=["matrix"])
@@ -28,4 +28,4 @@ def calculate_matrix(payload: BirthData) -> MatrixResult:
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Поддерживаются даты начиная с 1900 года",
         )
-    return build_result(payload.name, payload.date)
+    return calculate_matrix(payload.name, payload.date)
